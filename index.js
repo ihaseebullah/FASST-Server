@@ -13,10 +13,8 @@ const InsightsRouter = require('./Routes/InsightsRouter');
 const SocialRouter = require('./Routes/SocialRouter');
 const WorkoutRouter = require('./Routes/WorkoutsRouter');
 const MarketPlaceRouter = require('./Routes/MarketPlaceRouter');
-const workoutReset = require('./Utils/resetWorkoutStatus');
 require('./Utils/connectToDb');
 require('./Auth/Passport')
-require('./Utils/resetWorkoutStatus')
 const app = express();
 
 // Middleware

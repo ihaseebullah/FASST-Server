@@ -25,7 +25,7 @@ const UserSchema = new mongoose.Schema({
         healthGoal: String,
         cuisinePreference: String,
         mealsPerDay: String,
-        allergies: String
+        allergies: [String]
     },
     streak: { count: { type: Number, default: 0 }, updatedAt: Date },
     lastChallengeCompletedOn: Date

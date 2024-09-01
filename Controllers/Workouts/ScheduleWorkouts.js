@@ -89,14 +89,25 @@ const markExerciseComplete = async (req, res) => {
 const getExersices = async (req, res) => {
     try {
         const { userId, day } = req.params;
-        const workoutSchedule = await WORKOUT_SCHEDULE.findOne({ userId, day: day });
-        const challengesId = await USER.findById(userId, { DailyChallenges: 1 })
-        const challenges = await CHALLENGE.find({ _id: [...challengesId.DailyChallenges] })
-        console.log(challenges)
-        if (!workoutSchedule) {
-            return res.status(404).json({ message: "No workout schedule found for today." });
+        let workoutSchedule = await WORKOUT_SCHEDULE.findOne({ userId, day: day });
+        if (new Date().getDay != new Date(workoutSchedule.updatedAt).getDay()) {
+            workoutSchedule = await WORKOUT_SCHEDULE.findByIdAndUpdate(workoutSchedule._id, { $set: { 'workout.$[].status': false } })
+            const challengesId = await USER.findById(userId, { DailyChallenges: 1 })
+            const challenges = await CHALLENGE.find({ _id: [...challengesId.DailyChallenges] })
+            console.log(challenges)
+            if (!workoutSchedule) {
+                return res.status(404).json({ message: "No workout schedule found for today." });
+            }
+            return res.status(200).json({ workoutSchedule, challenges });
+        } else {
+            const challengesId = await USER.findById(userId, { DailyChallenges: 1 })
+            const challenges = await CHALLENGE.find({ _id: [...challengesId.DailyChallenges] })
+            console.log(challenges)
+            if (!workoutSchedule) {
+                return res.status(404).json({ message: "No workout schedule found for today." });
+            }
+            return res.status(200).json({ workoutSchedule, challenges });
         }
-        return res.status(200).json({ workoutSchedule, challenges });
     } catch (err) {
         console.error(err);
         res.status(500).json({ message: "Internal Server Error" });
