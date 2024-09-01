@@ -17,7 +17,7 @@ const UserSchema = new mongoose.Schema({
     WORKOUTS: [{ type: mongoose.Schema.Types.ObjectId, ref: "WORKOUT_SCHEDULE" }],
     INSIGHT: { type: mongoose.Schema.Types.ObjectId, ref: "INSIGHT" },
     // FOOD: [{ type: mongoose.Schema.Types.ObjectId, ref: "Food" }], // Moved to Insight Schema
-    OTP: { type: String, default: "AU-" + Math.floor(100000 + Math.random() * 900000).toString(), expires: '30m' },
+    OTP: { type: String, default:Math.floor(100000 + Math.random() * 900000).toString(), expires: '30m' },
     isVerified: { type: Boolean, default: false },
     VFCP: { type: Boolean, default: false }, // Verified for change password
     RECIPE_PREFRENCES: {

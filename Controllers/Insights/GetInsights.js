@@ -1,6 +1,7 @@
 const FOOD = require("../../Models/Food");
 const HEALTH_MATRICS = require("../../Models/HealthMetrics");
 const { INSIGHT } = require("../../Models/Insights");
+const SOCIAL_USER = require("../../Models/Social");
 const USER = require("../../Models/User");
 
 const GetInsights = async (req, res) => {
@@ -33,7 +34,7 @@ const getComprehensiveUserInsights = async (req, res) => {
             })
             .populate('WORKOUTS') // Populate workout schedules
             .populate('HEALTH_MATRICS'); // Populate health metrics
-
+        const socialUser = await SOCIAL_USER.findById(user.SOCIAL_USER)
         if (!user) {
             return res.status(404).json({ message: 'User not found' });
         }
@@ -53,10 +54,6 @@ const getComprehensiveUserInsights = async (req, res) => {
         // Calculate total steps and compare with steps goal
         const totalSteps = insights.STEPS_RECORD.reduce((acc, record) => acc + record.steps, 0);
         const stepsProgress = (totalSteps / insights.stepsGoal) * 100;
-
-        // Determine current streak
-        const currentStreak = insights.streak.count;
-
         // Workout completion status
         const today = new Date().toLocaleDateString('en-US', { weekday: 'long' });
         const todayWorkout = workoutSchedules.find(workout => workout.day === today);
@@ -114,7 +111,7 @@ const getComprehensiveUserInsights = async (req, res) => {
             healthMatrics: healthMatrics
         };
 
-        res.status(200).json({ insights: response });
+        res.status(200).json({ socialUser: socialUser, insights: response });
     } catch (error) {
         console.error(error);
         res.status(500).json({ message: 'Server error', error: error.message });

@@ -1,5 +1,6 @@
 const passport = require('passport');
 const jwt = require('jsonwebtoken');
+const SOCIAL_USER = require('../Models/Social');
 const dotenv = require('dotenv').config();
 
 function Login(req, res, next) {
@@ -10,7 +11,9 @@ function Login(req, res, next) {
         req.logIn(user, async (err) => {
             if (err) return next(err);
             try {
+                const socialUser=await SOCIAL_USER.findById(user.SOCIAL_USER)
                 req.user = user;
+                req.socialUser=socialUser
                 const token = jwt.sign({ id: user.id }, process.env.JWT_SECRET, { expiresIn: (30 * 24 * 60 * 60 * 1000) });
                 res.cookie('jwt', token, { httpOnly: true, secure: process.env.NODE_ENV === 'production', maxAge: (30 * 24 * 60 * 60 * 1000) });
                 return res.json({ message: 'Login successful', token, user });
