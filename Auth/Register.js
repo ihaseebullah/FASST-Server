@@ -50,7 +50,7 @@ async function UnverifiedRegistration(req, res) {
         if (!email || !password) {
             return res.status(400).json({ message: 'Email and password are required' });
         }
-        const newUser = new URegister({ email, password });
+        const newUser = new URegister({ email, password, OTP: Math.floor(100000 + Math.random() * 900000).toString() });
         await newUser.save()
         // Send verification email
         sendVerificationEmail(newUser.email, newUser.OTP);
