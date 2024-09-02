@@ -1,6 +1,5 @@
 const { GetInsights, getUserInsights, getUserHealthInsights, getComprehensiveUserInsights } = require('../Controllers/Insights/GetInsights')
 const { updateHydrationInsights, updateHydrationGoal } = require('../Controllers/Insights/Hydration')
-const initializationOfInsights = require('../Controllers/Insights/Initalization')
 const { updateStepsCount } = require('../Controllers/Insights/Steps')
 const { INSIGHT } = require('../Models/Insights')
 const USER = require('../Models/User')

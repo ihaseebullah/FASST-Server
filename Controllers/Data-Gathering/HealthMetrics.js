@@ -1,7 +1,7 @@
 const HEALTH_MATRICS = require("../../Models/HealthMetrics");
 const SOCIAL_USER = require("../../Models/Social");
 const USER = require("../../Models/User");
-const initialization = require("../Insights/Initalization");
+// const initialization = require("../Insights/Initalization");
 
 const calculateBMR = (gender, weight, height, age, activityLevel) => {
     let bmr;
@@ -27,7 +27,6 @@ const PostHealthMetrics = async (req, res) => {
         const parsedWeight = parseFloat(weight);
         const bmi = parsedWeight / Math.pow(parsedHeight / 100, 2) // height is converted to meters for BMI
         const bmr = goal === "increase" ? calculateBMR(gender, parsedWeight, parsedHeight, age, activityLevel) + 500 : goal === "maintain" ? calculateBMR(gender, parsedWeight, parsedHeight, age, activityLevel) : (calculateBMR(gender, parsedWeight, parsedHeight, age, activityLevel) - 500);
-        initialization()
         const healthMetrics = new HEALTH_MATRICS({
             userId,
             height: parsedHeight,
