@@ -17,5 +17,14 @@ AuthRouter.post('/forgot-password/send-OTP', SendOTP)
 AuthRouter.put('/forgot-password/verify-OTP', verifyOTP)
 AuthRouter.put('/forgot-password/reset-password', resetPassword)
 
+//logout
+AuthRouter.post('/logout', (req, res) => {
+    req.user = null;
+    req.socialUser = null
+    res.clearCookie('jwt');
+    res.status(200).json({ message: 'Logged out successfully' });
+});
+
+
 
 module.exports = AuthRouter

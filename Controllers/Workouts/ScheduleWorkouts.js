@@ -89,28 +89,47 @@ const markExerciseComplete = async (req, res) => {
 const getExersices = async (req, res) => {
     try {
         const { userId, day } = req.params;
-        let workoutSchedule = await WORKOUT_SCHEDULE.findOne({ userId, day: day });
-        if (new Date().getDay != new Date(workoutSchedule.updatedAt).getDay()) {
-            workoutSchedule = await WORKOUT_SCHEDULE.findByIdAndUpdate(workoutSchedule._id, { $set: { 'workout.$[].status': false } })
-            const challengesId = await USER.findById(userId, { DailyChallenges: 1 })
-            const challenges = await CHALLENGE.find({ _id: [...challengesId.DailyChallenges] })
-            console.log(challenges)
-            if (!workoutSchedule) {
-                return res.status(404).json({ message: "No workout schedule found for today." });
-            }
-            return res.status(200).json({ workoutSchedule, challenges });
-        } else {
-            const challengesId = await USER.findById(userId, { DailyChallenges: 1 })
-            const challenges = await CHALLENGE.find({ _id: [...challengesId.DailyChallenges] })
-            console.log(challenges)
-            if (!workoutSchedule) {
-                return res.status(404).json({ message: "No workout schedule found for today." });
-            }
-            return res.status(200).json({ workoutSchedule, challenges });
+
+        // Find the workout schedule for the specific user and day
+        let workoutSchedule = await WORKOUT_SCHEDULE.findOne({ userId, day });
+
+        // Function to check if the day has changed since the last update
+        const isDifferentDay = (lastUpdated) => {
+            const now = new Date();
+            const lastUpdateDate = new Date(lastUpdated);
+            return now.getDate() !== lastUpdateDate.getDate() ||
+                now.getMonth() !== lastUpdateDate.getMonth() ||
+                now.getFullYear() !== lastUpdateDate.getFullYear();
+        };
+
+        // Check if workout schedule exists and needs resetting
+        if (workoutSchedule && isDifferentDay(workoutSchedule.updatedAt)) {
+            // Reset all workout status to false
+            await WORKOUT_SCHEDULE.updateOne(
+                { _id: workoutSchedule._id },
+                { $set: { 'workout.$[].status': false } }
+            );
+
+            // Update the workoutSchedule object to get the latest data after update
+            workoutSchedule = await WORKOUT_SCHEDULE.findById(workoutSchedule._id);
         }
+
+        // Retrieve daily challenges for the user
+        const challengesId = await USER.findById(userId, { DailyChallenges: 1 });
+        const challenges = await CHALLENGE.find({ _id: { $in: challengesId.DailyChallenges } });
+
+        // If no workout schedule is found, return 404
+        if (!workoutSchedule) {
+            return res.status(404).json({ message: "No workout schedule found for today." });
+        }
+
+        // Return the updated workout schedule and challenges
+        return res.status(200).json({ workoutSchedule, challenges });
+
     } catch (err) {
         console.error(err);
         res.status(500).json({ message: "Internal Server Error" });
     }
-}
+};
+
 module.exports = { ScheduleWorkouts, markExerciseComplete, getExersices };

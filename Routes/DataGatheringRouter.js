@@ -76,16 +76,20 @@ DataGatheringRouter.put('/data-gathering/diet-plan/:userId', async (req, res) =>
 });
 
 
-DataGatheringRouter.post('/recipes/food/recommendations', async (req, res) => {
+DataGatheringRouter.get('/recipes/food/recommendations/:userId', async (req, res) => {
     try {
+        const user = await USER.findById(req.params.userId)
+        const USER_PREFS = user.RECIPE_PREFRENCES
         const {
             dietaryPreference,
             healthGoal,
             cuisinePreference,
             mealsPerDay,
             allergies
-        } = req.body;
-        console.log(req.body);
+        } = USER_PREFS;
+        if (!dietaryPreference) {
+            return res.status(200)
+        }
         const highProteinThreshold = 20;
         const lowCarbThreshold = 15;
         let portionSizeAdjustment = 1; // Default adjustment for meals
