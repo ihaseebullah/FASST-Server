@@ -1,6 +1,7 @@
 const HEALTH_MATRICS = require("../../Models/HealthMetrics");
 const SOCIAL_USER = require("../../Models/Social");
 const USER = require("../../Models/User");
+const initialization = require("../Insights/Initalization");
 
 const calculateBMR = (gender, weight, height, age, activityLevel) => {
     let bmr;
@@ -26,7 +27,7 @@ const PostHealthMetrics = async (req, res) => {
         const parsedWeight = parseFloat(weight);
         const bmi = parsedWeight / Math.pow(parsedHeight / 100, 2) // height is converted to meters for BMI
         const bmr = goal === "increase" ? calculateBMR(gender, parsedWeight, parsedHeight, age, activityLevel) + 500 : goal === "maintain" ? calculateBMR(gender, parsedWeight, parsedHeight, age, activityLevel) : (calculateBMR(gender, parsedWeight, parsedHeight, age, activityLevel) - 500);
-
+        initialization()
         const healthMetrics = new HEALTH_MATRICS({
             userId,
             height: parsedHeight,
@@ -40,21 +41,6 @@ const PostHealthMetrics = async (req, res) => {
 
         await healthMetrics.save().then(async (savedMetrics) => {
             await USER.findByIdAndUpdate(userId, { HEALTH_MATRICS: savedMetrics._id, calories: bmr.toFixed(2) }).then(async (user) => {
-                const initalizeSocialPlatform = new SOCIAL_USER({
-                    username: user.email.split("@")[0],
-                    userId: user._id,
-                    profilePic: gender === "female" ? 'https://res.cloudinary.com/dwe2jadmh/image/upload/v1724691754/uqn0o7gsto2nw6jhngom.png' : "https://res.cloudinary.com/dwe2jadmh/image/upload/v1724691753/k61qztl9o2jcfcbln9yn.png",
-                    firstName: '',
-                    lastName: '',
-                    bio: 'Nothing here yet',
-                    meet_up_requests: [],
-                    prefrences: {
-                        visibility: true,
-                    }
-                })
-                await initalizeSocialPlatform.save().then(async (socialUser) => {
-                    await USER.findByIdAndUpdate(user._id, { SOCIAL_USER: socialUser._id })
-                })
                 res.status(201).json(user);
             });
         });

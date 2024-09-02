@@ -1,3 +1,4 @@
+const createSocialProfile = require('../Controllers/Data-Gathering/SocialUser')
 const { createMeetup, getMeetups, updateMeetupStatus } = require('../Controllers/Social/Meetups')
 const { InitializeApp, GetSocialUser, EditUser, updateLocation, getUsersLocations } = require('../Controllers/Social/UserData')
 const { CreatePost, GetPosts } = require('../Controllers/Social/UserPosts')
@@ -5,7 +6,7 @@ const { CreatePost, GetPosts } = require('../Controllers/Social/UserPosts')
 const SocialRouter = require('express').Router()
 
 // Basic Information
-SocialRouter.post('/social/initialize', InitializeApp)
+SocialRouter.post('/social/initialize/create-social-profile', createSocialProfile)
 SocialRouter.get('/social/get-user/:socialUserId', GetSocialUser)
 SocialRouter.put('/social/edit-user/:socialUserId', EditUser)
 

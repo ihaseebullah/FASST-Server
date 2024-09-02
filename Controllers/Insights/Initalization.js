@@ -1,7 +1,8 @@
 const { INSIGHT } = require("../../Models/Insights");
 const USER = require("../../Models/User");
 
-const initialization = async (req, res) => {
+const initializationOfInsights = async (req, res) => {
+    console.log('req.params')
     try {
         const { userId } = req.params;
         const user = await USER.findById(userId);
@@ -45,8 +46,8 @@ const initialization = async (req, res) => {
         }
     } catch (e) {
         console.error(e);
-        return res.status(500).json({ error: "Server Error" });
+        res.status(500).json({ error: "Server Error" });
     }
 }
 
-module.exports = initialization;
+module.exports = initializationOfInsights;
