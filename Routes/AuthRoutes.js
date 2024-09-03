@@ -22,7 +22,10 @@ AuthRouter.post('/logout', (req, res) => {
     req.user = null;
     req.socialUser = null
     res.clearCookie('jwt');
-    res.status(200).json({ message: 'Logged out successfully' });
+    req.logout(function (err) {
+        if (err) { return next(err); }
+        res.status(200).json({ message: 'Logged out successfully' });
+    });
 });
 
 
