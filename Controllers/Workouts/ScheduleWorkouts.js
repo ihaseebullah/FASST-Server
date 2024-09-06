@@ -119,12 +119,13 @@ const getExersices = async (req, res) => {
         const challenges = await CHALLENGE.find({ _id: { $in: challengesId.DailyChallenges } });
 
         // If no workout schedule is found, return 404
-        if (!workoutSchedule) {
+        if (!workoutSchedule && !challenges) {
             return res.status(404).json({ message: "No workout schedule found for today." });
+        } else {
+            return res.status(200).json({ workoutSchedule, challenges });
         }
 
         // Return the updated workout schedule and challenges
-        return res.status(200).json({ workoutSchedule, challenges });
 
     } catch (err) {
         console.error(err);

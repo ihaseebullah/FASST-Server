@@ -7,17 +7,17 @@ const ChallengeSchema = new mongoose.Schema({
     },
     duration: {
         type: String,
-        required: true, 
     },
     gymPoints: {
         type: Number,
-        required: true 
+        required: true
     },
     status: {
         type: String,
         enum: ['not started', 'in progress', 'completed'],
         default: 'not started'
-    }
+    },
+    steps: Number,
 }, { timestamps: true });
 const CHALLENGE = mongoose.model('CHALLENGE', ChallengeSchema);
 
