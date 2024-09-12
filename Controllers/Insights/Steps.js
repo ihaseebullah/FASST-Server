@@ -33,12 +33,13 @@ const updateStepsCount = async (req, res) => {
         insight = await INSIGHT.findByIdAndUpdate(user.INSIGHT, {
           $push: { STEPS_RECORD: savedRecord._id },
         });
+        return res.json(savedRecord);
       });
-      return res.json(insight);
     } else {
       todayRecord.steps += parseInt(steps);
-      await todayRecord.save();
-      return res.json(insight);
+      await todayRecord.save().then((updatedRecord) => {
+        return res.json(updatedRecord);
+      })
     }
   } catch (e) {
     console.error(e);
