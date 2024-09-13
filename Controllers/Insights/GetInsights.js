@@ -28,7 +28,7 @@ const getComprehensiveUserInsights = async (req, res) => {
             .populate({
                 path: 'INSIGHT',
                 populate: [
-                    { path: 'STEPS_RECORD' },  // Populate steps record
+                    { path: 'STEPS_RECORD', options: { sort: { _id: -1 }, limit: 1 } },  // Populate steps record
                     { path: 'FOOD' },           // Populate food data
                 ]
             })
