@@ -27,7 +27,7 @@ app.use(express.json());
 app.use(cookieParser());
 
 cloudinary.config({
-    cloud_name: process.env.CLD_Name,
+    cloud_name: process.env.CLD_NAME,
     api_key: process.env.API_KEY,
     api_secret: process.env.API_SECRET
 });
