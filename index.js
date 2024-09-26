@@ -13,56 +13,109 @@ const InsightsRouter = require('./Routes/InsightsRouter');
 const SocialRouter = require('./Routes/SocialRouter');
 const WorkoutRouter = require('./Routes/WorkoutsRouter');
 const MarketPlaceRouter = require('./Routes/MarketPlaceRouter');
+const cloudinary = require('cloudinary').v2
+const multer = require('multer');
 require('./Utils/connectToDb');
 require('./Auth/Passport')
 const app = express();
+const storage = multer.memoryStorage()
+const upload = multer({ storage })
 
 // Middleware
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 app.use(cookieParser());
 
-// Set up session management
-app.use(session({
-    secret: process.env.SESSION_SECRET,
-    resave: false,
-    saveUninitialized: true,
-    cookie: {
-        secure: process.env.NODE_ENV === 'production',
-        maxAge: 24 * 60 * 60 * 1000 // 24 hours in milliseconds
+cloudinary.config({
+    cloud_name: 'dwe2jadmh',
+    api_key: '174523445685639',
+    api_secret: 'fic7vt0PlcsdIteHDBU0GBQvBec'
+});
+
+app.post('/api/fasst/services/upload', upload.single('file'), async (req, res) => {
+    if (!req.file) {
+        return res.status(400).send('No file uploaded.');
     }
-}));
-
-// Initialize Passport.js
-app.use(passport.initialize());
-app.use(passport.session());
-
-// Error handling
-app.use((err, req, res, next) => {
-    console.error(err.stack);
-    res.status(500).send('Something went wrong!');
+    try {
+        console.log('Uploaded file:', req.file);
+        const stream = cloudinary.uploader.upload_stream(
+            { resource_type: 'auto' },
+            (error, result) => {
+                if (error) {
+                    console.error('Cloudinary upload error:', error);
+                    return res.status(500).send(error);
+                }
+                console.log('Upload successful:', result);
+                return res.json({ url: result.secure_url });
+            }
+        );
+        stream.end(req.file.buffer);
+    } catch (error) {
+        console.error('Internal Server Error:', error);
+        res.status(500).send('Internal Server Error');
+    }
 });
 
-// Authentication Router
-app.use('/auth', AuthRouter);
 
-// Authenticate via JWT if available
-app.use(authenticateJWT)
+// Set up session management
+// app.use(session({
+//     secret: process.env.SESSION_SECRET,
+//     resave: false,
+//     saveUninitialized: true,
+//     cookie: {
+//         secure: process.env.NODE_ENV === 'production',
+//         maxAge: 24 * 60 * 60 * 1000 // 24 hours in milliseconds
+//     }
+// }));
 
-// Challenges Middlware
-app.use(challengesPicker);
+// // Initialize Passport.js
+// app.use(passport.initialize());
+// app.use(passport.session());
 
-// App Routes
-app.get('/root', isLoggedin, (req, res) => {
-    console.log(req.user)
-    res.json(req.user)
+// // Error handling
+// app.use((err, req, res, next) => {
+//     console.error(err.stack);
+//     res.status(500).send('Something went wrong!');
+// });
+
+// // Authentication Router
+// app.use('/auth', AuthRouter);
+
+// // Authenticate via JWT if available
+// app.use(authenticateJWT)
+
+// // Challenges Middlware
+// app.use(challengesPicker);
+
+// // App Routes
+// app.get('/root', isLoggedin, (req, res) => {
+//     console.log(req.user)
+//     res.json(req.user)
+// });
+// app.use('/api', ChallengesRouter)
+// app.use('/api', DataGatheringRouter)
+// app.use('/api', InsightsRouter)
+// app.use('/api', SocialRouter)
+// app.use('/api', WorkoutRouter)
+// app.use('/api', MarketPlaceRouter)
+
+app.post('/api/fasst/services/upload', upload.single('file'), async (req, res) => {
+    try {
+        const result = await cloudinary.uploader.upload_stream(
+            { resource_type: 'auto' },
+            (error, result) => {
+                if (error) {
+                    return res.status(500).send(error);
+                }
+                return res.json({ url: result.secure_url });
+            }
+        );
+        req.file.buffer.pipe(result);
+    } catch (error) {
+        res.status(500)
+    }
 });
-app.use('/api', ChallengesRouter)
-app.use('/api', DataGatheringRouter)
-app.use('/api', InsightsRouter)
-app.use('/api', SocialRouter)
-app.use('/api', WorkoutRouter)
-app.use('/api', MarketPlaceRouter)
+
 // Start server
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
