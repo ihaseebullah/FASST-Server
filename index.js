@@ -21,7 +21,6 @@ const app = express();
 const storage = multer.memoryStorage()
 const upload = multer({ storage })
 
-// Middleware
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 app.use(cookieParser());
