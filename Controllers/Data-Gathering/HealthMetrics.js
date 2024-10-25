@@ -21,7 +21,7 @@ const calculateMacronutrients = (totalCalories, proteinRatio = 0.30, carbRatio =
     return {
         protein: proteinGrams.toFixed(2), // Round to 2 decimal places
         carbs: carbGrams.toFixed(2),
-        fats: fatGrams.toFixed(2)
+        fat: fatGrams.toFixed(2)
     };
 };
 const calculateBMR = (gender, weight, height, age, activityLevel) => {
