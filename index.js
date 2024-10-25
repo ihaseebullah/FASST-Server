@@ -75,7 +75,9 @@ app.use('/api', WorkoutRouter)
 app.use('/api', MarketPlaceRouter)
 
 // Media upload bridge
-app.post('/api/fasst/services/upload', upload.single('file'), mediaUpload(req, res, cloudinary));
+app.post('/api/fasst/services/upload', upload.single('file'), async (req, res) => {
+    return mediaUpload(req, res, cloudinary)
+});
 
 
 //Start server
