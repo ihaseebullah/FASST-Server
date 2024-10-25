@@ -111,7 +111,7 @@ DataGatheringRouter.get('/recipes/food/recommendations/:userId', async (req, res
         });
 
         // Exclude recipes containing any of the specified allergens
-        if ([allergies] && [allergies].length > 0) {
+        if ([allergies] && [allergies].length > 0 && allergies[0] != "None") {
             pipeline.push({
                 $match: {
                     Ingredients: { $nin: [allergies].map(allergy => new RegExp(allergy, 'i')) }
