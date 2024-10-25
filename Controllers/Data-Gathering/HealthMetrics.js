@@ -2,7 +2,28 @@ const HEALTH_MATRICS = require("../../Models/HealthMetrics");
 const SOCIAL_USER = require("../../Models/Social");
 const USER = require("../../Models/User");
 // const initialization = require("../Insights/Initalization");
+const calculateMacronutrients = (totalCalories, proteinRatio = 0.30, carbRatio = 0.40, fatRatio = 0.30) => {
+    // Ensure ratios add up to 100%
+    if ((proteinRatio + carbRatio + fatRatio) !== 1) {
+        throw new Error('Macronutrient ratios must sum to 1');
+    }
 
+    // Calculate calories for each macronutrient
+    const proteinCalories = totalCalories * proteinRatio;
+    const carbCalories = totalCalories * carbRatio;
+    const fatCalories = totalCalories * fatRatio;
+
+    // Convert calories to grams
+    const proteinGrams = proteinCalories / 4;  // 1 gram protein = 4 calories
+    const carbGrams = carbCalories / 4;        // 1 gram carb = 4 calories
+    const fatGrams = fatCalories / 9;          // 1 gram fat = 9 calories
+
+    return {
+        protein: proteinGrams.toFixed(2), // Round to 2 decimal places
+        carbs: carbGrams.toFixed(2),
+        fats: fatGrams.toFixed(2)
+    };
+};
 const calculateBMR = (gender, weight, height, age, activityLevel) => {
     let bmr;
 
@@ -36,6 +57,7 @@ const PostHealthMetrics = async (req, res) => {
             bmi: bmi.toFixed(2),
             totallCaloriesToConsume: bmr.toFixed(2),
             activityLevel,
+            macronutrients: calculateMacronutrients(bmr, 0.30, 0.40, 0.30)
         });
 
         await healthMetrics.save().then(async (savedMetrics) => {

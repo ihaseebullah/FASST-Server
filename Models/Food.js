@@ -9,8 +9,15 @@ const FoodSchema = new mongoose.Schema({
         name: { type: String, required: true },
         calories: { type: Number, required: true },
         foodId: { type: mongoose.Schema.Types.ObjectId, ref: "Food Data" },
-        servingSize: Number,
-    }]
+        servingSize: Number, protein: Number,
+        carbs: Number,
+        fat: Number
+    }],
+    macronutrients: {
+        protein: Number,
+        carbs: Number,
+        fat: Number
+    }
 }, {
     timestamps: true,
     indexes: [

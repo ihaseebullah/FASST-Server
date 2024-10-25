@@ -4,7 +4,7 @@ const USER = require("../../Models/User");
 
 const foodIntake = async (req, res) => {
     try {
-        const { userId, foodName, foodCalories, foodId, servingSize } = req.body;
+        const { userId, foodName, foodCalories, foodId, servingSize, protein, carbs, fats } = req.body;
         const user = await USER.findById(userId);
         const insights = await INSIGHT.findById(user.INSIGHT);
         const existingFoodObject = await FOOD.findOne({ date: new Date().toLocaleDateString(), userId });
@@ -12,13 +12,21 @@ const foodIntake = async (req, res) => {
         if (existingFoodObject) {
             existingFoodObject.foods.push({ name: foodName, calories: parseInt(foodCalories), foodId: foodId, servingSize: servingSize });
             existingFoodObject.caloriesConsumed += parseInt(foodCalories);
+            existingFoodObject.macronutrients.protein += parseInt(protein);
+            existingFoodObject.macronutrients.carbs += parseInt(carbs);
+            existingFoodObject.macronutrients.fat += parseInt(fats);
             await existingFoodObject.save();
             return res.status(201).json(existingFoodObject);
         } else {
             const foodObjectForToday = new FOOD({
                 date: new Date().toLocaleDateString(),
-                foods: [{ name: foodName, calories: parseInt(foodCalories), foodId: foodId, servingSize: servingSize }],
+                foods: [{ name: foodName, calories: parseInt(foodCalories), foodId: foodId, servingSize: servingSize, carbs, protein: protein, fat: fats }],
                 caloriesConsumed: parseInt(foodCalories),
+                macronutrients: {
+                    protein: parseInt(protein),
+                    carbs: parseInt(carbs),
+                    fat: parseInt(fats)
+                },
                 userId: userId
             });
             await foodObjectForToday.save();
