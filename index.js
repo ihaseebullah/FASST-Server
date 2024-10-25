@@ -15,6 +15,7 @@ const WorkoutRouter = require('./Routes/WorkoutsRouter');
 const MarketPlaceRouter = require('./Routes/MarketPlaceRouter');
 const cloudinary = require('cloudinary').v2
 const multer = require('multer');
+const { mediaUpload } = require('./Controllers/Uploads/upload');
 require('./Utils/connectToDb');
 require('./Auth/Passport')
 const app = express();
@@ -73,30 +74,8 @@ app.use('/api', SocialRouter)
 app.use('/api', WorkoutRouter)
 app.use('/api', MarketPlaceRouter)
 
-
-app.post('/api/fasst/services/upload', upload.single('file'), async (req, res) => {
-    if (!req.file) {
-        return res.status(400).send('No file uploaded.');
-    }
-    try {
-        console.log('Uploaded file:', req.file);
-        const stream = cloudinary.uploader.upload_stream(
-            { resource_type: 'auto' },
-            (error, result) => {
-                if (error) {
-                    console.error('Cloudinary upload error:', error);
-                    return res.status(500).send(error);
-                }
-                console.log('Upload successful:', result);
-                return res.json({ url: result.secure_url });
-            }
-        );
-        stream.end(req.file.buffer);
-    } catch (error) {
-        console.error('Internal Server Error:', error);
-        res.status(500).send('Internal Server Error');
-    }
-});
+// Media upload bridge
+app.post('/api/fasst/services/upload', upload.single('file'), mediaUpload(req, res, cloudinary));
 
 
 //Start server
