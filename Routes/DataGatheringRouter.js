@@ -112,6 +112,7 @@ DataGatheringRouter.get('/recipes/food/recommendations/:userId', async (req, res
 
         // Exclude recipes containing any of the specified allergens
         if ([allergies] && [allergies].length > 0 && allergies[0] != "None") {
+            console.log('false')
             pipeline.push({
                 $match: {
                     Ingredients: { $nin: [allergies].map(allergy => new RegExp(allergy, 'i')) }
@@ -158,9 +159,7 @@ DataGatheringRouter.get('/recipes/food/recommendations/:userId', async (req, res
         pipeline.push({
             $limit: 7
         });
-
         const recipes = await DIET.aggregate(pipeline);
-        console.log(recipes)
         res.json(recipes);
     } catch (err) {
         console.error(err);
