@@ -3,6 +3,7 @@ const USER = require("../Models/User");
 const emailVerification = async (req, res) => {
     try {
         const { OTP, userId } = req.body;
+        console.log(OTP)
         const User = await USER.findById(userId);
         if (User.OTP == OTP) {
             User.isVerified = true;
